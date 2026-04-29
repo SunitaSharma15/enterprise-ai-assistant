@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from llm_service import ask_llm
 
 app = FastAPI()
 
@@ -21,7 +22,22 @@ def health():
 
 @app.post("/ask")
 def ask_ai(request: AskRequest):
-    return {
-        "question": request.question,
-        "answer": f"You asked: {request.question}"
-    }
+    try:
+        answer = ask_llm(request.question)
+        return {
+            "question": request.question,
+            "answer": answer
+        }
+    except Exception as e:
+        return {
+            "question": request.question,
+            "answer": f"Error: {str(e)}"
+        }
+
+
+
+
+
+
+
+
