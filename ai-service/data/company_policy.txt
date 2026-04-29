@@ -1,0 +1,4 @@
+Employees receive 20 annual leave days per year.
+Work from home is allowed 2 days per week.
+Sick leave requires manager notification.
+Laptop requests are approved by IT team.

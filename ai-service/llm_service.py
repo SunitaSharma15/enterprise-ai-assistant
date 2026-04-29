@@ -1,25 +1,35 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
+import requests
 
-load_dotenv()
+def ask_llm(context_docs, question):
+    context = "\n".join(context_docs)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    system_prompt = """
+You are an enterprise knowledge assistant.
+Answer only from the provided context.
+If the answer is not found, say:
+'Information not found in documents.'
+Keep the answer concise and professional.
+"""
 
-def ask_llm(question: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful enterprise AI assistant. Give clear and concise answers."
-            },
-            {
-                "role": "user",
-                "content": question
-            }
-        ],
-        temperature=0.3
+    user_prompt = f"""
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+    response = requests.post(
+        "http://localhost:11434/api/chat",
+        json={
+            "model": "llama3",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "stream": False
+        }
     )
 
-    return response.choices[0].message.content
+    data = response.json()
+    return data["message"]["content"]
